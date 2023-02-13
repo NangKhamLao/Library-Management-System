@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book List</title>
+    <!-- Bootstrap CSS -->
+    <!-- CSS only -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+</head>
+<body>
+    <h3 align="center">Books Lists</h3>
+    <div class="container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col"><a href="/" class="btn btn-secondary">Home</a></th>
+                    <th scope="col"><a href="/book/create" class="btn btn-primary">Create Book</a></th>
+                    <th scope="col"><a href="/category/list" class="btn btn-primary">Category List</a></th>
+                    <th scope="col"><a href="/mybookings" class="btn btn-info">My Bookings</a></th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-10 col-lg-4">
+                <div>
+                    <select class="form-control form-select-sm" id="catid" aria-label="Default select example">
+                        <option value="" selected>All Categories</option>
+                        {{ range $value := .Category}}
+                        <option value="{{$value.Name}}" >{{$value.Name}}</option>
+                        {{end}}
+                    </select>
+                </div>
+            </div>
+            <div class="col-12 col-md-10 col-lg-8">
+                <form action="/book/search">
+                    <div class="align-items-center">
+                        <div class="col-auto">
+                            <i class="fas fa-search h4 text-body"></i>
+                        </div>
+                        <!--end of col-->
+                        <div class="row">
+                            <div class="col-8">
+                                <input class="form-control form-control-borderless" type="search" placeholder="Search Books" name="search" value="{{.Search}}">
+                            </div>
+                            <!--end of col-->
+                            <div class="col-auto">
+                                <button class="btn btn-success" type="submit">Search</button>
+                            </div>
+                            <!--end of col-->
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!--end of col-->
+        </div>
+    </div>
+    <br>
+    <div class="container">
+        <table id="myTable" class="table table-striped" style="width:100%">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Image</th>
+                    <th>Category Name</th>
+                    <th>Book Name</th>
+                    <th>Author Name</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{ range .Book}}
+                    <tr id="myTR">
+                        <td>{{.ID}}</td>
+                        <td>
+                            {{if .Image}}
+                                <img src="/asset/{{.Image}}" alt="Image" width="100px">
+                            {{else}}
+                                <img src="https://image.freepik.com/free-vector/blank-book-cover-template-with-pages-front-side-standing_47649-397.jpg" alt="Image" width="100px">
+                            {{end}}
+                        </td>
+                        <td>{{.Cat_name}}</td>
+                        <td>{{.Book_name}}</td>
+                        <td>{{.AuthorName}}</td>
+                        <td>{{if eq .Status true}}
+                                <div style="color: green;">Active</div>
+                            {{else}}
+                                <div style="color: red;">Inactive</div>
+                            {{end}}
+                        </td>
+                        <td>
+                            <a href="/book/{{.ID}}/edit" class="btn btn-info">Edit</a>
+                            <a href="/book/{{.ID}}/delete" class="btn btn-danger">Delete</a>
+                            {{if .Status}}
+                                <a href="/bookings/{{.ID}}/create" class="btn btn-dark">Book</a>
+                            {{else}}
+                                <a class="btn btn-warning">Booked</a>
+                            {{end}}
+                            <a href="/book/{{.ID}}/bookdetails" class="btn btn-success">Book Details</a>
+                        </td>
+                    </tr>
+                {{end}}
+            </tbody>
+        </table>
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-end">
+                <li class="page-item">
+                    {{if .PreviousPageURL}}
+                        <a class="page-link" href="{{.PreviousPageURL}}">Previous</a>
+                    {{else}}
+                        <span class="page-link" aria-disabled="true">Previous</span>
+                    {{end}}
+                </li>
+                {{ range .Paginate}}
+                    <li class="page-item">
+                        {{if eq $.CurrentPage .PageNumber}}
+                            <span class="page-link" style="background-color: greenyellow;">{{.PageNumber}}</span>
+                        {{else}}
+                            <a class="page-link" href="{{.URL}}">{{.PageNumber}}</a>
+                        {{end}}
+                    </li>
+                {{end}}
+                <li class="page-item">
+                    {{if .NextPageURL}}
+                        <a class="page-link" href="{{.NextPageURL}}">Next</a>
+                    {{else}}
+                        <a class="page-link" aria-disabled="true">Next</a>
+                    {{end}}
+                </li>
+            </ul>
+        </nav>
+    </div>
+</body>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $("#catid").on("change", function() {
+        var value = $(this).val().toLowerCase();
+        $("#myTable #myTR").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+        });
+    });
+</script>
+</html>
